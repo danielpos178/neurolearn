@@ -1,4 +1,4 @@
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { calculateUserLevel } from "./level-calculator"
 
 /**
@@ -15,7 +15,7 @@ export async function addUserXP(
   details: Record<string, any> = {},
 ): Promise<boolean> {
   try {
-    const supabase = createClientSupabaseClient()
+    const supabase = createClient()
 
     // Get current XP
     const { data: profile, error: profileError } = await supabase
@@ -78,7 +78,7 @@ export async function addUserXP(
  */
 export async function getUserXPAndLevel(userId: string): Promise<{ xp: number; level: number } | null> {
   try {
-    const supabase = createClientSupabaseClient()
+    const supabase = createClient()
 
     const { data: profile, error } = await supabase.from("profiles").select("xp").eq("id", userId).single()
 

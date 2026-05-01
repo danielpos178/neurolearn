@@ -13,11 +13,11 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import { Award, Star, Share2, Twitter, Facebook, Linkedin, Copy, Check } from "lucide-react"
+import { Award, Star, Share2, MessageSquare, Users, Briefcase, Copy, Check } from "lucide-react"
 import confetti from "canvas-confetti"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { toast } from "@/components/ui/use-toast"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 
 interface BadgeInfo {
   id: string
@@ -49,7 +49,7 @@ export function BadgeUnlockPopup({
 }: BadgeUnlockPopupProps) {
   const [badge, setBadge] = useState<BadgeInfo | null>(propsBadge || null)
   const [copied, setCopied] = useState(false)
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
 
   // Determine if the dialog should be open
   const dialogOpen = open !== undefined ? open : isOpen !== undefined ? isOpen : false
@@ -71,7 +71,7 @@ export function BadgeUnlockPopup({
     if (badgeId && dialogOpen) {
       // First try to fetch from database
       const fetchBadge = async () => {
-        const { data } = await supabase.from("badges").select("*").eq("id", badgeId).single()
+        const { data } = (await supabase.from("badges").select("*").eq("id", badgeId).single()) as { data: any }
 
         if (data) {
           setBadge({
@@ -237,15 +237,15 @@ export function BadgeUnlockPopup({
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem onClick={() => handleShare("twitter")}>
-                <Twitter className="mr-2 h-4 w-4" />
+                <MessageSquare className="mr-2 h-4 w-4" />
                 <span>Twitter</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleShare("facebook")}>
-                <Facebook className="mr-2 h-4 w-4" />
+                <Users className="mr-2 h-4 w-4" />
                 <span>Facebook</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleShare("linkedin")}>
-                <Linkedin className="mr-2 h-4 w-4" />
+                <Briefcase className="mr-2 h-4 w-4" />
                 <span>LinkedIn</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={copyToClipboard}>

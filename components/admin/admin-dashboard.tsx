@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
   })
 
   const { toast } = useToast()
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
 
   useEffect(() => {
     fetchLessons()

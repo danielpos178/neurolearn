@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { LoadingProvider } from "@/components/loading-provider"
 import { BadgeNotificationProvider } from "@/components/badge-notification-provider"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { PerformanceMonitor } from "./performance-monitor"
 import { RegisterServiceWorker as RegisterSW } from "./register-sw"
 import { cn } from "@/lib/utils"
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     telephone: false,
   },
   manifest: "/manifest.json",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
+
   robots: {
     index: true,
     follow: true,
@@ -75,15 +75,22 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
   },
   applicationName: "NeuroLearn",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#161d1d" },
-  ],
+
   other: {
     "apple-mobile-web-app-capable": "yes",
     "mobile-web-app-capable": "yes",
   },
     generator: 'v0.dev'
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#161d1d" },
+  ],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

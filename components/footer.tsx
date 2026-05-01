@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Mail, Github, Instagram } from "lucide-react"
+import { Mail, Code, Camera } from "lucide-react"
 import { GoogleTranslateWidget } from "./google-translate-widget"
 
 export function Footer() {
@@ -26,7 +26,7 @@ export function Footer() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Github className="h-4 w-4" />
+            <Code className="h-4 w-4" />
             <span className="sr-only">GitHub</span>
           </Link>
 
@@ -36,7 +36,7 @@ export function Footer() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Instagram className="h-4 w-4" />
+            <Camera className="h-4 w-4" />
             <span className="sr-only">Instagram</span>
           </Link>
 

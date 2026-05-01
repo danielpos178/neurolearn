@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Layout from "@/components/layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { useLoading } from "@/components/loading-provider"
 import { DeleteAccount } from "@/components/settings/delete-account"
 import { Button } from "@/components/ui/button"
@@ -26,7 +26,7 @@ interface UserProfile {
 
 export default function SettingsPage() {
   const router = useRouter()
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
   const { setIsLoading } = useLoading()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)

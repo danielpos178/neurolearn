@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { CheckCircle, Loader2 } from "lucide-react"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
@@ -18,7 +18,7 @@ interface MarkLessonCompleteProps {
 export function MarkLessonComplete({ lessonId, userId, isCompleted, onComplete }: MarkLessonCompleteProps) {
   const [loading, setLoading] = useState(false)
   const [completed, setCompleted] = useState(isCompleted)
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
   const { toast } = useToast()
   const router = useRouter()
 

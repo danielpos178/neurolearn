@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Award, BookOpen, Flame, Zap } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { calculateUserLevel } from "@/lib/utils/level-calculator"
 import { getUserStreak } from "@/lib/utils/streak-calculator"
 
@@ -43,7 +43,7 @@ export function StatsGrid({
 
     async function fetchStats() {
       setLoading(true)
-      const supabase = createClientSupabaseClient()
+      const supabase = createClient()
 
       // Get current user
       const { data: userData } = await supabase.auth.getUser()

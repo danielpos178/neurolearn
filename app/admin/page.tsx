@@ -1,21 +1,21 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import AdminDashboard from "@/components/admin/admin-dashboard"
 import Layout from "@/components/layout"
 
 export default async function AdminPage() {
-  const supabase = createServerSupabaseClient()
+  const supabase = await createClient()
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session) {
+  if (!user) {
     redirect("/login")
   }
 
   // Check if user is admin
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", session.user.id).single()
+  const { data: profile } = (await supabase.from("profiles").select("role").eq("id", user.id).single()) as { data: { role: string } | null }
 
   if (!profile || profile.role !== "admin") {
     redirect("/dashboard")

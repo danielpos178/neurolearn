@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { toast } from "@/components/ui/use-toast"
 
 interface PomodoroTimerProps {
@@ -92,7 +92,7 @@ export function PomodoroTimer({ onComplete }: PomodoroTimerProps) {
 
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
 
   // Load saved settings
   useEffect(() => {

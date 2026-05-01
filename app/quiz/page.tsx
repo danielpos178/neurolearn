@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { CheckCircle, Loader2 } from "lucide-react"
 import Layout from "@/components/layout"
 import ProgressBar from "@/components/progress-bar"
@@ -68,7 +68,7 @@ export default function Quiz() {
   const [error, setError] = useState<string | null>(null)
   const totalSteps = questions.length + 1 // Questions + results page
   const router = useRouter()
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
 
   const handleOptionSelect = (optionType: string) => {
     setSelectedOption(optionType)

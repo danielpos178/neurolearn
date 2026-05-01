@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { Copy, Users, Lock, Globe, UserMinus, Settings, Trash } from "lucide-react"
 import {
@@ -33,7 +33,7 @@ interface GroupDetailsProps {
 export function GroupDetails({ group, isMember, userRole, memberCount = 0 }: GroupDetailsProps) {
   const { toast } = useToast()
   const router = useRouter()
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
   const [isEditing, setIsEditing] = useState(false)
   const [isLeaving, setIsLeaving] = useState(false)
   const [name, setName] = useState(group.name)

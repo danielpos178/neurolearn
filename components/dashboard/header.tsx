@@ -4,12 +4,12 @@ import { useState, useEffect } from "react"
 import { Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 
 export function DashboardHeader() {
   const [userName, setUserName] = useState("")
   const [loading, setLoading] = useState(true)
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
 
   useEffect(() => {
     async function getUserProfile() {

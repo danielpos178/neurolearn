@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/components/ui/use-toast"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
 
@@ -29,7 +29,7 @@ export function CreateGroupButton() {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
 
   const handleCreateGroup = async (e: React.FormEvent) => {
     e.preventDefault()

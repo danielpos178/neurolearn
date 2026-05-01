@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import Layout from "@/components/layout"
 import { GroupDetails } from "@/components/groups/group-details"
@@ -7,13 +7,14 @@ import { GroupMembers } from "@/components/groups/group-members"
 import { GroupPosts } from "@/components/groups/group-posts"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-export default async function GroupPage({ params }: { params: { id: string } }) {
-  const supabase = await createServerSupabaseClient()
+export default async function GroupPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const supabase = await createClient()
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
     redirect("/login")
   }
 
@@ -29,7 +30,7 @@ export default async function GroupPage({ params }: { params: { id: string } }) 
         joined_at
       )
     `)
-    .eq("id", params.id)
+    .eq("id", id)
     .single()
 
   if (groupError) {
@@ -38,7 +39,7 @@ export default async function GroupPage({ params }: { params: { id: string } }) 
   }
 
   // Check if the user is a member of the group
-  const memberRecord = group.members.find((member: any) => member.user_id === session.user.id)
+  const memberRecord = group.members.find((member: any) => member.user_id === user.id)
   const isMember = !!memberRecord
   const userRole = memberRecord?.role || null
 
@@ -109,7 +110,7 @@ export default async function GroupPage({ params }: { params: { id: string } }) 
       likes,
       comments
     `)
-    .eq("group_id", params.id)
+    .eq("group_id", id)
     .order("created_at", { ascending: false })
 
   if (postsError) {
@@ -172,22 +173,22 @@ export default async function GroupPage({ params }: { params: { id: string } }) 
             <TabsTrigger value="posts">Postări ({postsWithAuthors?.length || 0})</TabsTrigger>
           </TabsList>
           <TabsContent value="leaderboard" className="mt-4">
-            <GroupLeaderboard leaderboard={leaderboardData} groupId={params.id} />
+            <GroupLeaderboard leaderboard={leaderboardData} groupId={id} />
           </TabsContent>
           <TabsContent value="members" className="mt-4">
             <GroupMembers
               members={membersWithProfiles}
-              groupId={params.id}
+              groupId={id}
               userRole={userRole}
-              currentUserId={session.user.id}
+              currentUserId={user.id}
             />
           </TabsContent>
           <TabsContent value="posts" className="mt-4">
             <GroupPosts
               posts={postsWithAuthors}
-              groupId={params.id}
+              groupId={id}
               isMember={isMember}
-              currentUserId={session.user.id}
+              currentUserId={user.id}
             />
           </TabsContent>
         </Tabs>

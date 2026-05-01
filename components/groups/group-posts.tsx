@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Send, Trash2 } from "lucide-react" // Removed ThumbsUp, MessageSquare
 import { useToast } from "@/components/ui/use-toast"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { formatDistanceToNow } from "date-fns"
 import { ro } from "date-fns/locale"
@@ -26,7 +26,7 @@ export function GroupPosts({ posts = [], groupId, isMember, currentUserId }: Gro
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
 
   const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault()

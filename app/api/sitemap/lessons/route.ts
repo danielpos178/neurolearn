@@ -1,9 +1,9 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 
 export async function GET() {
   try {
-    const supabase = createServerSupabaseClient()
+    const supabase = await createClient()
 
     // Obținem toate lecțiile
     const { data: lessons } = await supabase

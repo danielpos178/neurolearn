@@ -7,7 +7,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { UserNav } from "@/components/user-nav"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -24,13 +24,13 @@ const navigation = [
   { name: "Unelte", href: "/unelte" },
 ]
 
-function Header({}: {}) {
+function Header({ hideNavigation }: { hideNavigation?: boolean }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
 
   useEffect(() => {
     async function getUser() {
@@ -56,8 +56,8 @@ function Header({}: {}) {
     return () => subscription.unsubscribe()
   }, [supabase.auth])
 
-  // Only show navigation if user is authenticated and hideNavigation is false and not on home page
-  const showNavigation = user
+  // Only show navigation if user is authenticated and hideNavigation is false
+  const showNavigation = user && !hideNavigation
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -140,10 +140,15 @@ function Header({}: {}) {
   )
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+interface LayoutProps {
+  children: React.ReactNode
+  hideNavigation?: boolean
+}
+
+export default function Layout({ children, hideNavigation }: LayoutProps) {
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
+      <Header hideNavigation={hideNavigation} />
       <main className="flex-1">{children}</main>
       <Footer />
     </div>

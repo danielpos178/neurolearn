@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import Layout from "@/components/layout"
 import Link from "next/link"
@@ -9,12 +9,12 @@ import { Badge } from "@/components/ui/badge"
 import JoinPublicGroupButton from "@/components/groups/join-public-group-button"
 
 export default async function PublicGroupsPage() {
-  const supabase = await createServerSupabaseClient()
+  const supabase = await createClient()
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
     redirect("/login")
   }
 
@@ -47,7 +47,7 @@ export default async function PublicGroupsPage() {
   const { data: userMemberships } = await supabase
     .from("group_members")
     .select("group_id")
-    .eq("user_id", session.user.id)
+    .eq("user_id", user.id)
 
   const userGroupIds = new Set(userMemberships?.map((m) => m.group_id) || [])
 

@@ -6,7 +6,7 @@ import { ro } from "date-fns/locale"
 import { CalendarClock, CheckCircle2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 
 interface Task {
   id: string
@@ -19,7 +19,7 @@ interface Task {
 export function UpcomingTasks({ tasks: propTasks }: { tasks?: Task[] | null }) {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
 
   useEffect(() => {
     // If tasks are passed as props, use them

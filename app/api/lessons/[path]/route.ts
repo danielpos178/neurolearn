@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import path from "path"
 import fs from "fs/promises"
 
@@ -20,8 +20,9 @@ function getLessonFilePath(contentPath: string) {
   return path.join(CONTENT_DIR, `${contentPath}.md`)
 }
 
-export async function GET(request: NextRequest, { params }: { params: { path: string } }) {
-  const supabase = createServerSupabaseClient()
+export async function GET(request: NextRequest, { params }: { params: Promise<{ path: string }> }) {
+  const { path: contentPath } = await params
+  const supabase = await createClient()
 
   // Check authentication
   const {
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
     await ensureContentDir()
 
     // Try to get the lesson content from the file system first
-    const filePath = getLessonFilePath(params.path)
+    const filePath = getLessonFilePath(contentPath)
 
     try {
       const fileContent = await fs.readFile(filePath, "utf-8")
@@ -59,7 +60,7 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
       const { data: lesson, error } = await supabase
         .from("lessons")
         .select("content")
-        .eq("content_path", params.path)
+        .eq("content_path", contentPath)
         .single()
 
       if (!error && lesson && lesson.content) {
@@ -68,7 +69,7 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
       }
 
       // If not found in database or no content, fall back to the mock function
-      const content = getLessonContent(params.path, style)
+      const content = getLessonContent(contentPath, style)
       return NextResponse.json({ content })
     }
   } catch (error) {

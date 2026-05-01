@@ -23,7 +23,7 @@ import {
   Sparkles,
   CheckCircle,
 } from "lucide-react"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { BadgeUnlockPopup } from "./badge-unlock-popup"
 
 interface BadgesGridProps {
@@ -51,7 +51,7 @@ export function BadgesGrid({ completedLessons, streak, highestStreak, level, tot
   const [methodUsage, setMethodUsage] = useState<Record<string, number>>({})
   const [showBadgePopup, setShowBadgePopup] = useState(false)
   const [unlockedBadgeId, setUnlockedBadgeId] = useState("")
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
 
   // Update the useEffect hook to fetch badges from the database
   useEffect(() => {

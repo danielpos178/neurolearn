@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import Layout from "@/components/layout"
 import { Card } from "@/components/ui/card"
@@ -10,15 +10,16 @@ import { LessonContent } from "@/components/lessons/lesson-content"
 import { Badge } from "@/components/ui/badge"
 
 interface LessonPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function generateMetadata({ params }: LessonPageProps): Promise<Metadata> {
-  const supabase = createServerSupabaseClient()
+  const { id } = await params
+  const supabase = await createClient()
 
-  const { data: lesson } = await supabase.from("lessons").select("title, description").eq("id", params.id).single()
+  const { data: lesson } = await supabase.from("lessons").select("title, description").eq("id", id).single()
 
   if (!lesson) {
     return {
@@ -33,17 +34,18 @@ export async function generateMetadata({ params }: LessonPageProps): Promise<Met
 }
 
 export default async function LessonPage({ params }: LessonPageProps) {
-  const supabase = createServerSupabaseClient()
+  const { id } = await params
+  const supabase = await createClient()
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
     redirect("/login")
   }
 
   // Get lesson details with better error handling
-  const { data: lesson, error: lessonError } = await supabase.from("lessons").select("*").eq("id", params.id).single()
+  const { data: lesson, error: lessonError } = await supabase.from("lessons").select("*").eq("id", id).single()
 
   if (lessonError) {
     console.error("Error fetching lesson:", lessonError)
@@ -58,14 +60,14 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const { data: progress } = await supabase
     .from("lesson_progress")
     .select("*")
-    .eq("user_id", session.user.id)
-    .eq("lesson_id", params.id)
+    .eq("user_id", user.id)
+    .eq("lesson_id", id)
     .single()
 
   const isCompleted = progress?.completed || false
 
   // Get user profile to determine learning style
-  const { data: profile } = await supabase.from("profiles").select("learning_style").eq("id", session.user.id).single()
+  const { data: profile } = await supabase.from("profiles").select("learning_style").eq("id", user.id).single()
 
   const userLearningStyle = profile?.learning_style || "visual"
   const isMatchingStyle = lesson.learning_style === userLearningStyle || lesson.learning_style === "all"
@@ -130,7 +132,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
                 <span>Marchează ca finalizată pentru a primi XP</span>
               )}
             </div>
-            <MarkLessonComplete lessonId={params.id} userId={session.user.id} isCompleted={isCompleted} />
+            <MarkLessonComplete lessonId={id} userId={user.id} isCompleted={isCompleted} />
           </div>
         </div>
       </div>

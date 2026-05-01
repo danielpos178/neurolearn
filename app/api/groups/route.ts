@@ -1,20 +1,20 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 
 export async function GET(request: Request) {
-  const supabase = await createServerSupabaseClient()
+  const supabase = await createClient()
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   const { data: userGroups, error: userGroupsError } = await supabase
     .from("group_members")
     .select("group_id")
-    .eq("user_id", session.user.id)
+    .eq("user_id", user.id)
 
   if (userGroupsError) {
     console.error("Error fetching user groups:", userGroupsError)
@@ -50,12 +50,12 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const supabase = await createServerSupabaseClient()
+  const supabase = await createClient()
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
       .insert({
         name,
         description,
-        created_by: session.user.id,
+        created_by: user.id,
         is_private: isPrivate || false,
       })
       .select()

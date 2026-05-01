@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Layout from "@/components/layout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { MotivationalQuote } from "@/components/dashboard/motivational-quote"
 import { StatsGrid } from "@/components/dashboard/stats-grid"
 import { UpcomingTasks } from "@/components/dashboard/upcoming-tasks"
@@ -53,7 +53,7 @@ export default function DashboardPage() {
   const [activityLog, setActivityLog] = useState<ActivityLog[] | null>([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
   const { setIsLoading } = useLoading()
 
   useEffect(() => {

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { BadgeUnlockPopup } from "@/components/achievements/badge-unlock-popup"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 
 type BadgeNotificationContextType = {
   showBadgeNotification: (badgeId: string) => void
@@ -21,7 +21,7 @@ export function useBadgeNotification() {
 export function BadgeNotificationProvider({ children }: { children: ReactNode }) {
   const [badgeId, setBadgeId] = useState<string | null>(null)
   const [isOpen, setIsOpen] = useState(false)
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
 
   // Listen for badge unlock events from the server
   useEffect(() => {

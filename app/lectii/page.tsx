@@ -1,17 +1,17 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import Layout from "@/components/layout"
 import { LessonCard } from "@/components/lessons/lesson-card"
 import { DecorativeElements } from "@/components/lessons/decorative-elements"
 
 export default async function LectiiPage() {
-  const supabase = createServerSupabaseClient()
+  const supabase = await createClient()
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session) {
+  if (!user) {
     redirect("/login")
   }
 
@@ -19,7 +19,7 @@ export default async function LectiiPage() {
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("learning_style")
-    .eq("id", session.user.id)
+    .eq("id", user.id)
     .single()
 
   const userLearningStyle = profile?.learning_style || "visual"
@@ -42,7 +42,7 @@ export default async function LectiiPage() {
   const { data: progress } = await supabase
     .from("lesson_progress")
     .select("lesson_id, completed")
-    .eq("user_id", session.user.id)
+    .eq("user_id", user.id)
 
   // Create a map of lesson progress for easy lookup
   const progressMap = new Map()

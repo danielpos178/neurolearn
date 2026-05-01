@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import path from "path"
 import fs from "fs/promises"
 
@@ -23,7 +23,7 @@ async function ensureContentDir() {
 
 // GET handler to retrieve lesson content
 export async function GET(request: NextRequest) {
-  const supabase = createServerSupabaseClient()
+  const supabase = await createClient()
 
   // Check authentication
   const {
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
 
 // POST handler to save lesson content
 export async function POST(request: NextRequest) {
-  const supabase = createServerSupabaseClient()
+  const supabase = await createClient()
 
   // Check authentication
   const {
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
 
 // DELETE handler to remove lesson content
 export async function DELETE(request: NextRequest) {
-  const supabase = createServerSupabaseClient()
+  const supabase = await createClient()
 
   // Check authentication
   const {

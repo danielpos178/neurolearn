@@ -1,14 +1,14 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createServerSupabaseClient()
+    const supabase = await createClient()
 
     const {
-      data: { session },
-    } = await supabase.auth.getSession()
-    if (!session) {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
       .from("group_members")
       .select("id")
       .eq("group_id", groupId)
-      .eq("user_id", session.user.id)
+      .eq("user_id", user.id)
       .maybeSingle()
 
     if (existingMember) {
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
     // Add user to group
     const { error } = await supabase.from("group_members").insert({
       group_id: groupId,
-      user_id: session.user.id,
+      user_id: user.id,
       role: "member",
     })
 

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { motion } from "framer-motion"
 
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { useLoading } from "@/components/loading-provider"
 
 import { Button } from "@/components/ui/button"
@@ -25,10 +25,9 @@ export default function Register() {
   const [userType, setUserType] = useState("student")
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [registrationComplete, setRegistrationComplete] = useState(false) // Renamed 'done' to 'registrationComplete' for clarity
 
   const router = useRouter()
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
   const { setIsLoading } = useLoading()
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -75,30 +74,17 @@ export default function Register() {
         console.error("Signup error:", signUpError)
         setError(signUpError.message)
       } else if (user) {
-        // Create a profile record with explicit null values for learning_style and bio
-        const { error: profileError } = await supabase.from("profiles").insert([
-          {
-            id: user.id,
-            first_name: firstName.trim(),
-            last_name: lastName.trim(),
-            full_name: fullName,
-            learning_style: null, // Explicitly set to null
-            bio: null, // Explicitly set to null
-            role: userType,
-            xp: 0, // Initialize XP to 0
-            streak: 0, // Initialize streak to 0
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-        ])
-
-        if (profileError) {
-          console.error("Error creating profile:", profileError)
-          setError("Eroare la crearea profilului. Vă rugăm să încercați din nou.")
-        } else {
-          // Show success message instead of redirecting
-          setRegistrationComplete(true)
+        // Prevent creating dummy profiles when Supabase returns a fake user due to email enumeration protection
+        if (user.identities && user.identities.length === 0) {
+          setError("Această adresă de email este deja înregistrată. Vă rugăm să vă conectați.")
+          setLoading(false)
+          setIsLoading(false)
+          return
         }
+
+        // The profile is automatically created by the Supabase database trigger 'handle_new_user'
+        // Since email confirmation is disabled, redirect directly to dashboard
+        router.push("/dashboard")
       }
     } catch (error) {
       console.error("Registration error:", error)
@@ -118,31 +104,7 @@ export default function Register() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-md"
         >
-          {registrationComplete ? (
-            <Card className="border-2 dark:border-zinc-800">
-              <CardHeader>
-                <CardTitle className="text-2xl">Înregistrare completă</CardTitle>
-                <CardDescription>
-                  Vă mulțumim pentru înregistrare! Vă rugăm să vă verificați email-ul pentru a confirma contul.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Alert className="border-teal-200 bg-teal-50 dark:border-teal-800 dark:bg-teal-950">
-                  <AlertDescription className="text-teal-800 dark:text-teal-200">
-                    Un email de confirmare a fost trimis la adresa {email}. Vă rugăm să urmați instrucțiunile din email
-                    pentru a vă activa contul.
-                  </AlertDescription>
-                </Alert>
-                <Button
-                  onClick={() => router.push("/login")}
-                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-                >
-                  Mergi la pagina de conectare
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card className="border-2 dark:border-zinc-800">
+          <Card className="border-2 dark:border-zinc-800">
               <CardHeader>
                 <CardTitle className="text-2xl">Înregistrare</CardTitle>
                 <CardDescription>Creați un cont nou pentru a începe călătoria de învățare.</CardDescription>
@@ -243,8 +205,7 @@ export default function Register() {
                   </Link>
                 </div>
               </CardFooter>
-            </Card>
-          )}
+          </Card>
         </motion.div>
       </div>
     </Layout>

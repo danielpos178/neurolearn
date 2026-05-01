@@ -1,13 +1,14 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const supabase = await createServerSupabaseClient()
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const supabase = await createClient()
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
@@ -23,7 +24,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
         joined_at
       )
     `)
-    .eq("id", params.id)
+    .eq("id", id)
     .single()
 
   if (error) {
@@ -32,7 +33,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
   }
 
   // Check if the user is a member of the group
-  const isMember = group.members.some((member: any) => member.user_id === session.user.id)
+  const isMember = group.members.some((member: any) => member.user_id === user.id)
   if (!isMember && group.is_private) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
@@ -98,7 +99,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
       likes,
       comments
     `)
-    .eq("group_id", params.id)
+    .eq("group_id", id)
     .order("created_at", { ascending: false })
 
   if (postsError) {
@@ -160,13 +161,14 @@ export async function GET(request: Request, { params }: { params: { id: string }
   })
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
-  const supabase = await createServerSupabaseClient()
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const supabase = await createClient()
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
@@ -177,8 +179,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     const { data: membership, error: membershipError } = await supabase
       .from("group_members")
       .select("role")
-      .eq("group_id", params.id)
-      .eq("user_id", session.user.id)
+      .eq("group_id", id)
+      .eq("user_id", user.id)
       .single()
 
     if (membershipError || membership.role !== "admin") {
@@ -192,7 +194,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         description,
         is_private: isPrivate,
       })
-      .eq("id", params.id)
+      .eq("id", id)
       .select()
       .single()
 
@@ -208,13 +210,14 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-  const supabase = await createServerSupabaseClient()
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const supabase = await createClient()
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
@@ -222,7 +225,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   const { data: group, error: groupError } = await supabase
     .from("groups")
     .select("created_by")
-    .eq("id", params.id)
+    .eq("id", id)
     .single()
 
   if (groupError) {
@@ -230,11 +233,11 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     return NextResponse.json({ error: "Failed to fetch group" }, { status: 500 })
   }
 
-  if (group.created_by !== session.user.id) {
+  if (group.created_by !== user.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 
-  const { error } = await supabase.from("groups").delete().eq("id", params.id)
+  const { error } = await supabase.from("groups").delete().eq("id", id)
 
   if (error) {
     console.error("Error deleting group:", error)

@@ -1,14 +1,14 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 
 export async function POST(request: NextRequest) {
-  const supabase = createServerSupabaseClient()
+  const supabase = await createClient()
 
   try {
     const {
-      data: { session },
-    } = await supabase.auth.getSession()
-    if (!session) {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       .from("group_members")
       .select("*")
       .eq("group_id", groupId)
-      .eq("user_id", session.user.id)
+      .eq("user_id", user.id)
       .eq("role", "admin")
       .single()
 
@@ -44,13 +44,13 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-  const supabase = createServerSupabaseClient()
+  const supabase = await createClient()
 
   try {
     const {
-      data: { session },
-    } = await supabase.auth.getSession()
-    if (!session) {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -61,7 +61,7 @@ export async function PUT(request: NextRequest) {
       .from("group_members")
       .select("*")
       .eq("group_id", groupId)
-      .eq("user_id", session.user.id)
+      .eq("user_id", user.id)
       .eq("role", "admin")
       .single()
 
@@ -88,7 +88,7 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const supabase = createServerSupabaseClient()
+  const supabase = await createClient()
   const url = new URL(request.url)
   const groupId = url.searchParams.get("groupId")
   const userId = url.searchParams.get("userId")
@@ -99,14 +99,14 @@ export async function DELETE(request: NextRequest) {
 
   try {
     const {
-      data: { session },
-    } = await supabase.auth.getSession()
-    if (!session) {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     // Dacă utilizatorul încearcă să se șteargă pe sine, permitem
-    if (userId === session.user.id) {
+    if (userId === user.id) {
       const { error } = await supabase.from("group_members").delete().eq("group_id", groupId).eq("user_id", userId)
 
       if (error) throw error
@@ -119,7 +119,7 @@ export async function DELETE(request: NextRequest) {
       .from("group_members")
       .select("*")
       .eq("group_id", groupId)
-      .eq("user_id", session.user.id)
+      .eq("user_id", user.id)
       .eq("role", "admin")
       .single()
 

@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import Layout from "@/components/layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,12 +13,12 @@ import { format, subDays } from "date-fns"
 import { ro } from "date-fns/locale"
 
 export default async function ProgresPage() {
-  const supabase = createServerSupabaseClient()
+  const supabase = await createClient()
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
     redirect("/login")
   }
 
@@ -29,10 +29,10 @@ export default async function ProgresPage() {
   const { data: progress } = await supabase
     .from("lesson_progress")
     .select("lesson_id, completed, completed_at")
-    .eq("user_id", session.user.id)
+    .eq("user_id", user.id)
 
   // Get user profile to get XP
-  const { data: profile } = await supabase.from("profiles").select("xp").eq("id", session.user.id).single()
+  const { data: profile } = await supabase.from("profiles").select("xp").eq("id", user.id).single()
 
   // Create a map of lesson progress for easy lookup
   const progressMap = new Map()
@@ -53,11 +53,11 @@ export default async function ProgresPage() {
   const { level } = calculateUserLevel(totalXP)
 
   // Calculate streaks
-  const currentStreak = await getUserStreak(supabase, session.user.id)
-  const highestStreak = await getHighestStreak(supabase, session.user.id)
+  const currentStreak = await getUserStreak(supabase, user.id)
+  const highestStreak = await getHighestStreak(supabase, user.id)
 
   // Get activity data for the last 7 days
-  const activityData = await getActivityData(supabase, session.user.id, 7)
+  const activityData = await getActivityData(supabase, user.id, 7)
 
   // Format the activity data for the chart
   const chartData = Array.from({ length: 7 }, (_, i) => {
@@ -84,7 +84,7 @@ export default async function ProgresPage() {
         learning_style
       )
     `)
-    .eq("user_id", session.user.id)
+    .eq("user_id", user.id)
     .eq("completed", true)
     .order("completed_at", { ascending: false })
 

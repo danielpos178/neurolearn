@@ -1,25 +1,11 @@
-import { createServerClient } from "@supabase/ssr"
-import { cookies } from "next/headers"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const cookieStore = cookies()
+    const { id } = await params
 
-    // Create a Supabase client with the service role key to bypass RLS
-    const supabase = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: any) {
-          cookieStore.set({ name, value, ...options })
-        },
-        remove(name: string, options: any) {
-          cookieStore.set({ name, value: "", ...options })
-        },
-      },
-    })
+    const supabase = await createClient()
 
     // Get the current user to verify admin status
     const {
@@ -50,8 +36,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     // Get the lesson data from the request body
     const lessonData = await request.json()
 
-    // Update the lesson
-    const { data, error } = await supabase.from("lessons").update(lessonData).eq("id", params.id).select()
+    // Update the lesson using admin client
+    const supabaseAdmin = createAdminClient()
+    const { data, error } = await supabaseAdmin.from("lessons").update(lessonData).eq("id", id).select()
 
     if (error) {
       console.error("Error updating lesson:", error)
@@ -65,24 +52,11 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const cookieStore = cookies()
+    const { id } = await params
 
-    // Create a Supabase client with the service role key to bypass RLS
-    const supabase = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: any) {
-          cookieStore.set({ name, value, ...options })
-        },
-        remove(name: string, options: any) {
-          cookieStore.set({ name, value: "", ...options })
-        },
-      },
-    })
+    const supabase = await createClient()
 
     // Get the current user to verify admin status
     const {
@@ -110,8 +84,9 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
       return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 })
     }
 
-    // Delete the lesson
-    const { error } = await supabase.from("lessons").delete().eq("id", params.id)
+    // Delete the lesson using admin client
+    const supabaseAdmin = createAdminClient()
+    const { error } = await supabaseAdmin.from("lessons").delete().eq("id", id)
 
     if (error) {
       console.error("Error deleting lesson:", error)

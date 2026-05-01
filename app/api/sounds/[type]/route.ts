@@ -1,16 +1,17 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 
 // This would normally fetch real audio files from storage
 // For this example, we'll simulate different noise types
-export async function GET(request: NextRequest, { params }: { params: { type: string } }) {
-  const supabase = createServerSupabaseClient()
+export async function GET(request: NextRequest, { params }: { params: Promise<{ type: string }> }) {
+  const { type } = await params
+  const supabase = await createClient()
 
   // Check authentication
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 

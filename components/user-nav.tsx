@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useLoading } from "@/components/loading-provider"
 import { Users, Settings, LogOut, Shield } from "lucide-react"
@@ -20,7 +20,7 @@ import { useEffect, useState } from "react"
 
 export function UserNav({ user }: { user: any }) {
   const router = useRouter()
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
   const { setIsLoading } = useLoading()
   const [isAdmin, setIsAdmin] = useState(false)
   const [userProfile, setUserProfile] = useState<any>(null)

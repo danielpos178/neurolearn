@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import rehypeRaw from "rehype-raw"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 
 interface LessonContentProps {
   contentPath: string
@@ -17,7 +17,7 @@ export function LessonContent({ contentPath, learningStyle, lessonId }: LessonCo
   const [content, setContent] = useState<string>("")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
 
   useEffect(() => {
     async function fetchContent() {

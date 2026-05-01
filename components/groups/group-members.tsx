@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal, Crown, Shield, User, UserMinus } from "lucide-react"
@@ -30,7 +30,7 @@ interface GroupMembersProps {
 export function GroupMembers({ members, groupId, userRole, currentUserId }: GroupMembersProps) {
   const { toast } = useToast()
   const router = useRouter()
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
   const [removingMember, setRemovingMember] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(false)
 

@@ -19,7 +19,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { toast } from "@/components/ui/use-toast"
 import { format, addDays, startOfWeek, endOfWeek, eachDayOfInterval, isToday, isSameDay } from "date-fns"
 import { ro } from "date-fns/locale"
@@ -103,7 +103,7 @@ export default function TodoPage() {
   const [activeTab, setActiveTab] = useState("kanban")
   const [currentWeek, setCurrentWeek] = useState(new Date())
   const router = useRouter()
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
   const { setIsLoading } = useLoading()
   const isDesktop = useMediaQuery("(min-width: 768px)")
   const badgeNotification = useBadgeNotification()

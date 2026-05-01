@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { toast } from "@/components/ui/use-toast"
 import { format, parseISO } from "date-fns"
 import { ro } from "date-fns/locale"
@@ -63,7 +63,7 @@ export default function AgendaPage() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("goals")
   const router = useRouter()
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
   const { setIsLoading } = useLoading()
   const isDesktop = useMediaQuery("(min-width: 768px)")
 

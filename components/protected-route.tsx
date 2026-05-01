@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Loader2, Lock } from "lucide-react"
@@ -12,12 +12,12 @@ import { Loader2, Lock } from "lucide-react"
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
   const router = useRouter()
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
 
   useEffect(() => {
     async function checkAuth() {
-      const { data } = await supabase.auth.getSession()
-      if (!data.session) {
+      const { data } = await supabase.auth.getUser()
+      if (!data.user) {
         setIsAuthenticated(false)
       } else {
         setIsAuthenticated(true)

@@ -1,5 +1,5 @@
 import Layout from "@/components/layout"
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { GroupsList } from "@/components/groups/groups-list"
 import { CreateGroupButton } from "@/components/groups/create-group-button"
@@ -10,12 +10,12 @@ import { Globe } from "lucide-react"
 import type { Tables } from "@/types/supabase" // Import type for Supabase tables
 
 export default async function GroupsPage() {
-  const supabase = await createServerSupabaseClient()
+  const supabase = await createClient()
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
     redirect("/login")
   }
 
@@ -23,7 +23,7 @@ export default async function GroupsPage() {
   const { data: membershipRows, error: membershipsError } = await supabase
     .from("group_members")
     .select("group_id")
-    .eq("user_id", session.user.id)
+    .eq("user_id", user.id)
 
   if (membershipsError) {
     console.error("Error fetching group memberships:", membershipsError)

@@ -13,13 +13,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { AlertTriangle, Loader2 } from "lucide-react"
-import { createClientSupabaseClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 
 export function DeleteAccount() {
   const [open, setOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const router = useRouter()
-  const supabase = createClientSupabaseClient()
+  const supabase = createClient()
 
   const handleDeleteAccount = async () => {
     setDeleting(true)
